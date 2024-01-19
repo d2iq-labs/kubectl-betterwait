@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "actionlint@latest",
+    "git@latest",
+    "github-cli@latest",
+    "gnumake@latest",
+    "go@latest",
+    "goreleaser@latest",
+    "pre-commit@latest",
+    "upx@latest"
+  ]
+}
