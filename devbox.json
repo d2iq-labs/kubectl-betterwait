@@ -5,8 +5,14 @@
     "github-cli@latest",
     "gnumake@latest",
     "go@latest",
+    "golines@latest",
     "goreleaser@latest",
+    "gotestsum@latest",
     "pre-commit@latest",
-    "upx@latest"
+    "upx@latest",
+    "yamale@latest",
+    "yamllint@latest",
+    "path:./hack/flakes#golangci-lint",
+    "path:./hack/flakes#setup-envtest"
   ]
 }
