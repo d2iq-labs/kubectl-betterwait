@@ -98,6 +98,26 @@
         }
       }
     },
+    "golines@latest": {
+      "last_modified": "2024-01-14T03:55:27Z",
+      "resolved": "github:NixOS/nixpkgs/dd5621df6dcb90122b50da5ec31c411a0de3e538#golines",
+      "source": "devbox-search",
+      "version": "0.11.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/yxaqc4p01hvnd13vs5qgyrnrfll4cw04-golines-0.11.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/fi27vi2x07gxba6qhcm3jmls5wakimzg-golines-0.11.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/vin9nwsdblna2kgkjp103mgx40hsqid1-golines-0.11.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/kkhhc0jic6j9lykdqf1qzchz3lyrcw4k-golines-0.11.0"
+        }
+      }
+    },
     "goreleaser@latest": {
       "last_modified": "2024-01-14T03:55:27Z",
       "resolved": "github:NixOS/nixpkgs/dd5621df6dcb90122b50da5ec31c411a0de3e538#goreleaser",
@@ -115,6 +135,26 @@
         },
         "x86_64-linux": {
           "store_path": "/nix/store/acdq08cx9sv82585s98y763iq1ki4rgd-goreleaser-1.23.0"
+        }
+      }
+    },
+    "gotestsum@latest": {
+      "last_modified": "2024-01-14T03:55:27Z",
+      "resolved": "github:NixOS/nixpkgs/dd5621df6dcb90122b50da5ec31c411a0de3e538#gotestsum",
+      "source": "devbox-search",
+      "version": "1.10.1",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/rhvzl8jhy7hihc2lc8lb75bs5pxhz3ja-gotestsum-1.10.1"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/smfna3vw3knp6gkcrbhd8sya0qsw8cyy-gotestsum-1.10.1"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/z6j2ndbkdiznnxpxb2h89ack6q7ml7d9-gotestsum-1.10.1"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/hxqhwmi4gx2zdvgshi8sb1rg7a0k9xqi-gotestsum-1.10.1"
         }
       }
     },
@@ -155,6 +195,46 @@
         },
         "x86_64-linux": {
           "store_path": "/nix/store/843k0ggr5l5plyv9hwralsnbhz810kb3-upx-4.2.2"
+        }
+      }
+    },
+    "yamale@latest": {
+      "last_modified": "2024-01-14T03:55:27Z",
+      "resolved": "github:NixOS/nixpkgs/dd5621df6dcb90122b50da5ec31c411a0de3e538#yamale",
+      "source": "devbox-search",
+      "version": "4.0.4",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/vhdh15ac728s0az0yrgn90ba7cdyfi9k-python3.11-yamale-4.0.4"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/lxalkikdacrgkmqmbdh0ixdfbcm704y2-python3.11-yamale-4.0.4"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/p3h5xdfa8yn6r1ki5d0ja9j3pyfwpjg4-python3.11-yamale-4.0.4"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/nd3blyvjnrxzqxlrl14kpwkgxn3bz7ap-python3.11-yamale-4.0.4"
+        }
+      }
+    },
+    "yamllint@latest": {
+      "last_modified": "2024-01-14T03:55:27Z",
+      "resolved": "github:NixOS/nixpkgs/dd5621df6dcb90122b50da5ec31c411a0de3e538#yamllint",
+      "source": "devbox-search",
+      "version": "1.33.0",
+      "systems": {
+        "aarch64-darwin": {
+          "store_path": "/nix/store/r6gg9y3pv1snnkbgzd6bnwrx6lvjmy5m-python3.11-yamllint-1.33.0"
+        },
+        "aarch64-linux": {
+          "store_path": "/nix/store/cd0sy9qbmrvlgx5zjw1sn28zbhi6rf3h-python3.11-yamllint-1.33.0"
+        },
+        "x86_64-darwin": {
+          "store_path": "/nix/store/94jj8a47d1h6jiak3wqrc2fxxgiabhwx-python3.11-yamllint-1.33.0"
+        },
+        "x86_64-linux": {
+          "store_path": "/nix/store/qn52zxjvinig2gf6q5zp1xgw9plyjadp-python3.11-yamllint-1.33.0"
         }
       }
     }

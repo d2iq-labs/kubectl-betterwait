@@ -40,6 +40,7 @@ func main() {
 		// kubectl wait will error if the objects don't exist https://github.com/kubernetes/kubectl/issues/1516
 		// first wait for objects to actually exist
 		if err := waitForObjectsToExist(args...); err != nil {
+			//nolint:stylecheck //want a linebreak
 			fmt.Fprint(os.Stderr, fmt.Errorf("%v\n", err))
 			os.Exit(1)
 		}
@@ -47,10 +48,10 @@ func main() {
 
 	// wait for the condition only after the objects exist
 	if err := waitForCondition(args...); err != nil {
+		//nolint:stylecheck //want a linebreak
 		fmt.Fprint(os.Stderr, fmt.Errorf("%v\n", err))
 		os.Exit(1)
 	}
-
 }
 
 func waitForObjectsToExist(args ...string) error {
@@ -84,12 +85,12 @@ func waitForObjectsToExist(args ...string) error {
 			return fmt.Errorf("timed out waiting for objects to exist")
 		case <-timer.C:
 			getErr := getObjects(getArgs...)
-			if getErr == nil {
+			switch {
+			case getErr == nil:
 				return nil
-			} else if errors.Is(getErr, ErrNotFound) {
-				// retry on next timer tick
-			} else {
-				// exit with an error on all other errors
+			case errors.Is(getErr, ErrNotFound):
+			// retry on next timer tick
+			default:
 				return getErr
 			}
 		}
@@ -97,6 +98,7 @@ func waitForObjectsToExist(args ...string) error {
 }
 
 func getObjects(args ...string) error {
+	//nolint:gosec // input is coming from users running this on their own machines
 	cmd := exec.Command(kubectl(), args...)
 	cmd.Stdout = os.Stdout
 	// the error message will be sent to cmd.Stderr and no the returned as err
@@ -121,6 +123,7 @@ func waitForCondition(args ...string) error {
 	// build the wait command using the original args
 	waitArgs := kubectlWaitArgsFromArgs(args...)
 
+	//nolint:gosec // input is coming from users running this on their own machines
 	cmd := exec.Command(kubectl(), waitArgs...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -204,11 +207,9 @@ func effectiveIntervalFromArgs(args ...string) (time.Duration, error) {
 	return effectiveInterval, nil
 }
 
-var (
-	kubectlExecutableEnv = os.Getenv("KUBECTL_EXECUTABLE")
-)
+var kubectlExecutableEnv = os.Getenv("KUBECTL_EXECUTABLE")
 
-// kubectl expects the kubectl executable to either be in the PATH or set with KUBECTL_EXECUTABLE env
+// kubectl expects the kubectl executable to either be in the PATH or set with KUBECTL_EXECUTABLE env.
 func kubectl() string {
 	executable := "kubectl"
 	if kubectlExecutableEnv != "" {
@@ -243,7 +244,7 @@ func isNotFound(err string) bool {
 
 // isValidGetFlag returns true if arg is a valid kubectl get arg
 // kubectl wait flags are a subset of kubectl get flags plus "--for" and "--timeout" flags
-// also exclude the "--interval" flag
+// also exclude the "--interval" flag.
 func isValidGetFlag(arg string) bool {
 	return !strings.HasPrefix(arg, "--for") &&
 		!strings.HasPrefix(arg, "--timeout") &&

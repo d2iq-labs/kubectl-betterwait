@@ -1,0 +1,143 @@
+# Copyright 2024 D2iQ, Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+repos:
+  - repo: local
+    hooks:
+      - id: golangci-lint
+        name: golangci-lint
+        entry: make lint
+        language: system
+        files: "(.*\\.go|go.mod|go.sum|go.mk)$"
+        pass_filenames: false
+      - id: hugo-mod-tidy
+        name: hugo-mod-tidy
+        entry: bash -c "cd docs && hugo mod tidy"
+        language: system
+        files: "^docs/"
+        pass_filenames: false
+      - id: examples-sync
+        name: examples-sync
+        entry: make examples.sync
+        language: system
+        files: "^hack/examples/"
+        pass_filenames: false
+      - id: apis-sync
+        name: apis-sync
+        entry: make apis.sync
+        language: system
+        files: "^(hack/third-party/|common/pkg/external/|make/apis.mk$)"
+        pass_filenames: false
+      - id: addons-sync
+        name: addons-sync
+        entry: make addons.sync
+        language: system
+        files: "^(hack/addons/|charts/capi-runtime-extensions/templates/.+/manifests/|make/addons.mk$)"
+        pass_filenames: false
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: v1.0.0-rc.1
+    hooks:
+      - id: go-mod-tidy
+        exclude: ^docs/
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [commit]
+      - id: check-yaml
+        args: ["-m", "--unsafe"]
+        stages: [commit]
+        exclude: ^charts/.+/templates/
+      - id: mixed-line-ending
+        args: ["-f", "lf"]
+        exclude: \.bat$
+        stages: [commit]
+      - id: no-commit-to-branch
+        stages: [commit]
+      - id: check-added-large-files
+        stages: [commit]
+        exclude: ^pkg/handlers/cni/calico/manifests/tigera-operator-configmap.yaml$
+      - id: check-case-conflict
+        stages: [commit]
+      - id: check-merge-conflict
+        stages: [commit]
+      - id: check-executables-have-shebangs
+        stages: [commit]
+      - id: check-symlinks
+        stages: [commit]
+      - id: end-of-file-fixer
+        stages: [commit]
+        exclude: ^charts/capi-runtime-extensions/README.md$
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.6.25
+    hooks:
+      - id: actionlint-system
+        stages: [commit]
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+      - id: gitlint-ci
+        args: ["--commits", "origin/main..HEAD"]
+  - repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 3.0.0
+    hooks:
+      - id: shfmt
+        stages: [commit]
+        args: ["-s", "-i", "2"]
+      - id: script-must-have-extension
+        stages: [commit]
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.5
+    hooks:
+      - id: shellcheck
+        stages: [commit]
+        args: ["-e", "SC2211", "-x"]
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.36.0
+    hooks:
+      - id: markdownlint
+        stages: [commit]
+        exclude: ^(CHANGELOG.md|charts/.+/README.md)$
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.4
+    hooks:
+      - id: insert-license
+        name: License headers - Go
+        stages: [commit]
+        files: "(.*\\.go|go.mod)$"
+        exclude: ^common/pkg/external/
+        args:
+          - --license-filepath
+          - hack/license-header.txt
+          - --comment-style
+          - //
+          - --allow-past-years
+      - id: insert-license
+        name: License headers - YAML and Makefiles
+        stages: [commit]
+        files: (^Makefile|\.(ya?ml|mk))$
+        exclude: ^(pkg/handlers/.+/embedded|examples|charts/capi-runtime-extensions/defaultclusterclasses)/.+\.ya?ml$
+        args:
+          - --license-filepath
+          - hack/license-header.txt
+          - --allow-past-years
+      - id: insert-license
+        name: License headers - Markdown
+        stages: [commit]
+        files: \.md$
+        exclude: ^(CHANGELOG.md$|docs/)
+        args:
+          - --license-filepath
+          - hack/license-header.txt
+          - --comment-style
+          - <!--|| -->
+          - --allow-past-years
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.11.1
+    hooks:
+      - id: helm-docs
+        stages: [commit]
+        args:
+          # Make the tool search for charts only under the `example-charts` directory
+          - --chart-search-root=charts

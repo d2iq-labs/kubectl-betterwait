@@ -38,15 +38,15 @@ endef
 .PHONY: test
 test: ## Runs go tests for all modules in repository
 ifneq ($(wildcard $(REPO_ROOT)/go.mod),)
-test: go-generate test.root
+test: test.root
 endif
 ifneq ($(words $(GO_SUBMODULES_NO_DOCS)),0)
-test: go-generate $(addprefix test.,$(GO_SUBMODULES_NO_DOCS:/go.mod=))
+test: $(addprefix test.,$(GO_SUBMODULES_NO_DOCS:/go.mod=))
 endif
 
 .PHONY: test.%
 test.%: ## Runs go tests for a specific module
-test.%: go-generate ; $(info $(M) running tests$(if $(GOTEST_RUN), matching "$(GOTEST_RUN)") for $* module)
+test.%: ; $(info $(M) running tests$(if $(GOTEST_RUN), matching "$(GOTEST_RUN)") for $* module)
 	$(if $(filter-out root,$*),cd $* && )$(call go_test)
 
 .PHONY: integration-test
@@ -172,15 +172,6 @@ endif
 go-fix.%: ## Runs golangci-lint for a specific module
 go-fix.%: ; $(info $(M) go fixing $* module)
 	$(if $(filter-out root,$*),cd $* && )go fix ./...
-
-.PHONY: go-generate
-go-generate: ## Runs go generate
-go-generate: ; $(info $(M) running go generate)
-	go generate -x ./...
-	controller-gen paths="./..." rbac:headerFile="hack/license-header.yaml.txt",roleName=capi-runtime-extensions-manager-role output:rbac:artifacts:config=charts/capi-runtime-extensions/templates
-	sed --in-place 's/capi-runtime-extensions-manager-role/{{ include "chart.name" . }}-manager-role/' charts/capi-runtime-extensions/templates/role.yaml
-	controller-gen paths="./api/..." object:headerFile="hack/license-header.go.txt" output:object:artifacts:config=/dev/null
-	$(MAKE) go-fix
 
 .PHONY: go-mod-upgrade
 go-mod-upgrade: ## Interactive check for direct module dependency upgrades
