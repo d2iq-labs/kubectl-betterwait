@@ -15,4 +15,5 @@ ifeq ($(wildcard $(PRE_COMMIT_CONFIG_FILE)),)
 endif
 	env SKIP=$(SKIP) pre-commit run -a --show-diff-on-failure --config $(PRE_COMMIT_CONFIG_FILE)
 	git fetch origin main
-	pre-commit run --hook-stage manual gitlint-ci
+	# found a similar issue in https://github.com/pypa/pip/issues/12372
+	#pre-commit run --hook-stage manual gitlint-ci
