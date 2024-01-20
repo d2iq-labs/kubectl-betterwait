@@ -15,6 +15,10 @@ import (
 	"time"
 )
 
+const (
+	intervalFlanName = "interval"
+)
+
 var (
 	ErrNotFound          = errors.New("objects not found")
 	ErrGettingObjects    = errors.New("error getting objects")
@@ -47,7 +51,7 @@ func main() {
 }
 
 func waitForObjectsToExist(args ...string) error {
-	// use the same args
+	// build the get command using the original args
 	getArgs := kubectlGetArgsFromArgs(args...)
 
 	// always try it at-least once
@@ -63,10 +67,14 @@ func waitForObjectsToExist(args ...string) error {
 	}
 	ctx, cancelFunc := context.WithTimeout(context.Background(), effectiveTimeout)
 	defer cancelFunc()
+	interval, err := effectiveIntervalFromArgs(args...)
+	if err != nil {
+		return err
+	}
 
 	for {
 		// retry every 10 seconds
-		timer := time.NewTimer(time.Second * 10)
+		timer := time.NewTimer(interval)
 		select {
 		case <-ctx.Done():
 			timer.Stop()
@@ -108,8 +116,8 @@ func getObjects(args ...string) error {
 
 func waitForCondition(args ...string) error {
 	// build the wait command using the original args
-	waitArgs := []string{"wait"}
-	waitArgs = append(waitArgs, args...)
+	waitArgs := kubectlWaitArgsFromArgs(args...)
+
 	cmd := exec.Command(kubectl(), waitArgs...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -127,6 +135,18 @@ func kubectlGetArgsFromArgs(args ...string) []string {
 	for _, arg := range args {
 		// pass all valid flags to kubectl get
 		if isValidGetFlag(arg) {
+			getArgs = append(getArgs, arg)
+		}
+	}
+
+	return getArgs
+}
+
+func kubectlWaitArgsFromArgs(args ...string) []string {
+	getArgs := []string{"wait"}
+	for _, arg := range args {
+		// pass all valid flags to kubectl wait
+		if isValidWaitFlag(arg) {
 			getArgs = append(getArgs, arg)
 		}
 	}
@@ -160,6 +180,27 @@ func effectiveTimeoutFromArgs(args ...string) (time.Duration, error) {
 	return effectiveTimeout, nil
 }
 
+func effectiveIntervalFromArgs(args ...string) (time.Duration, error) {
+	var interval []string
+	for _, arg := range args {
+		if strings.HasPrefix(arg, fmt.Sprintf("--%s", intervalFlanName)) {
+			interval = strings.FieldsFunc(arg, flagSplitter)
+		}
+	}
+
+	// the default kubectl wait timeout is 30 seconds, use that if not set
+	effectiveInterval := time.Second * 10
+	if len(interval) == 2 {
+		var err error
+		effectiveInterval, err = time.ParseDuration(interval[1])
+		if err != nil {
+			return -1, fmt.Errorf("error parsing --interval value: %v", err)
+		}
+	}
+
+	return effectiveInterval, nil
+}
+
 var (
 	kubectlExecutableEnv = os.Getenv("KUBECTL_EXECUTABLE")
 )
@@ -190,7 +231,13 @@ func isNotFound(err string) bool {
 
 // isValidGetFlag returns true if arg is a valid kubectl get arg
 // kubectl wait flags are a subset of kubectl get flags plus "--for" and "--timeout" flags
+// also exclude the "--interval" flag
 func isValidGetFlag(arg string) bool {
 	return !strings.HasPrefix(arg, "--for") &&
-		!strings.HasPrefix(arg, "--timeout")
+		!strings.HasPrefix(arg, "--timeout") &&
+		!strings.HasPrefix(arg, fmt.Sprintf("--%s", intervalFlanName))
+}
+
+func isValidWaitFlag(arg string) bool {
+	return !strings.HasPrefix(arg, fmt.Sprintf("--%s", intervalFlanName))
 }
