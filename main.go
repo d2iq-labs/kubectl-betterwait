@@ -35,11 +35,14 @@ func main() {
 		args = os.Args[1:]
 	}
 
-	// kubectl wait will error if the objects don't exist https://github.com/kubernetes/kubectl/issues/1516
-	// first wait for objects to actually exist
-	if err := waitForObjectsToExist(args...); err != nil {
-		fmt.Fprint(os.Stderr, fmt.Errorf("%v\n", err))
-		os.Exit(1)
+	// skip the "kubectl get" logic if used passed in --help
+	if !isRunningHelp(args...) {
+		// kubectl wait will error if the objects don't exist https://github.com/kubernetes/kubectl/issues/1516
+		// first wait for objects to actually exist
+		if err := waitForObjectsToExist(args...); err != nil {
+			fmt.Fprint(os.Stderr, fmt.Errorf("%v\n", err))
+			os.Exit(1)
+		}
 	}
 
 	// wait for the condition only after the objects exist
@@ -220,6 +223,15 @@ func logCmd(out io.Writer, cmd *exec.Cmd) {
 
 func flagSplitter(r rune) bool {
 	return r == '=' || r == ' '
+}
+
+func isRunningHelp(args ...string) bool {
+	for _, arg := range args {
+		if strings.HasPrefix(arg, "--help") {
+			return true
+		}
+	}
+	return false
 }
 
 func isNotFound(err string) bool {
