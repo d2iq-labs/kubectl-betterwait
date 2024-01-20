@@ -12,6 +12,9 @@ FROM --platform=linux/${TARGETARCH} linux-${TARGETARCH}
 
 COPY kubectl-betterwait /bin/kubectl-betterwait
 
+# set an environment variable with the path to kubectl in the base image
+ENV KUBECTL_EXECUTABLE=/bin/kubectl
+
 # Use uid of nonroot user (65532) because kubernetes expects numeric user when applying pod security policies
 USER 65532
 ENTRYPOINT ["/bin/kubectl-betterwait"]

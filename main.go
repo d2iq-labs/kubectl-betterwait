@@ -166,7 +166,7 @@ var (
 
 // kubectl expects the kubectl executable to either be in the PATH or set with KUBECTL_EXECUTABLE env
 func kubectl() string {
-	executable := "/bin/kubectl"
+	executable := "kubectl"
 	if kubectlExecutableEnv != "" {
 		executable = kubectlExecutableEnv
 	}
