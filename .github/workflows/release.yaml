@@ -1,10 +1,14 @@
-# Copyright 2021-2023 D2iQ, Inc. All rights reserved.
+# Copyright 2025 D2iQ, Inc. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
 name: release
 
 on:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build images for"
+        required: true
   push:
     tags:
       - v*
