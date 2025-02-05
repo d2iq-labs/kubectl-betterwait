@@ -1,0 +1,69 @@
+# Copyright 2025 D2iQ, Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+name: sync
+
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+jobs:
+  git-sync:
+    runs-on: ubuntu-22.04
+    outputs:
+      new_tags: ${{ steps.list-new-tags.outputs.new_tags }}
+    steps:
+      - name: List tags before sync
+        id: before-sync
+        run: |
+          echo "tags=$(
+            gh api --cache 0s --paginate /repos/${{ github.repository }}/tags | \
+              jq -r 'map(select(.name | test("^v1.([3-9][0-9]).[0-9]+$")))[].name' | \
+              tr '\n' ' '
+          )" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: git-sync-k8s-tags
+        uses: bei-re/git-sync-sha1@v1
+        with:
+          source_repo: "https://github.com/kubernetes/kubernetes.git"
+          source_branch: "refs/tags/*"
+          destination_repo: "git@github.com:${{github.repository}}.git"
+          destination_branch: "refs/tags/*"
+          destination_ssh_private_key: ${{ secrets.GHA_PR_APP_PRIVATE_KEY }}
+      - name: List tags after sync
+        id: after-sync
+        run: |
+          echo "tags=$(
+            gh api --cache 0s --paginate /repos/${{ github.repository }}/tags | \
+              jq -r 'map(select(.name | test("^v1.([3-9][0-9]).[0-9]+$")))[].name' | \
+              tr '\n' ' '
+          )" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: List new tags
+        id: list-new-tags
+        run: |
+          echo "new_tags=$(
+            echo ${{ steps.before-sync.outputs.tags }} ${{ steps.after-sync.outputs.tags }} | \
+            tr ' ' '\n' |
+            sort | uniq -u |
+            jq -R -s -c 'split("\n") | map(select(length > 0))'
+          )" >> $GITHUB_OUTPUT
+
+  trigger-image-build:
+    if: ${{ needs.git-sync.outputs.new_tags != '[]' && needs.git-sync.outputs.new_tags != '' }}
+    needs: [git-sync]
+    permissions:
+      actions: write
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        tag: ${{ fromJson(needs.git-sync.outputs.new_tags) }}
+    steps:
+      - name: Trigger image build workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: release
+          inputs: '{"tag": "${{ matrix.tag }}"}'
