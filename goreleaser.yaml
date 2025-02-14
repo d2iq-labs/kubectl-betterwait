@@ -1,6 +1,8 @@
 # Copyright 2024 D2iQ, Inc. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+version: 2
+
 project_name: kubectl-betterwait
 
 changelog:
@@ -50,7 +52,6 @@ builds:
 
 archives:
   - name_template: '{{ .ProjectName }}_v{{trimprefix .Version "v"}}_{{ .Os }}_{{ .Arch }}'
-    rlcp: true
     builds:
       - kubectl-betterwait
 
