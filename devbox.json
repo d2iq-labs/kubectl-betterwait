@@ -9,6 +9,7 @@
     "goreleaser@latest",
     "gotestsum@latest",
     "pre-commit@latest",
+    "shfmt@latest",
     "upx@latest",
     "yamale@latest",
     "yamllint@latest",
